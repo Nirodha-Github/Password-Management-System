@@ -1,0 +1,26 @@
+form label{
+    font-weight: bold;
+}
+
+nav ul li a{
+   color:darkgray;
+}
+
+
+nav ul li a:hover{
+   font-weight:bold;
+   color:#FCE181;
+}
+
+body{
+    background: url("/cover.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    
+}
+
+i{
+    font-family:OCR A Std;
+    font-size:12px;
+}
+

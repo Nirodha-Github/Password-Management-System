@@ -1,0 +1,19 @@
+<html>
+    <%- include("./partials/head.ejs") %>
+    <body>
+        <%- include("./partials/nav.ejs") %>
+        <div class="container" style="height:357px;">
+            <div class="row mt-4 mb-4">               
+                <h3 class="text-info row col-sm-12 mb-2">Add new data</h3><br>  
+                <form class="col-sm-10 col-12 col-sm-offset m-2" method="POST" action="/details">
+                <div class="form-group"><label class="form-label text-light" for="website">Website</label><input class="form-control" id="website" placeholder="Enter your website :www.github.com" type="text" name="website" ></div>
+                <div class="form-group"><label for="username" class="form-label text-light" >User Name</label><input class="form-control" id="username" placeholder="Enter your username :Kamal Perea or kamal456@gmail.com"  type="text" name="username"></div>
+                <div class="form-group"><label for="password" class="form-label text-light" >Password</label><input class="form-control mb-3" id="pass" placeholder="Enter your website  :gitkamal123$"  type="password" name="password"></div>
+                <button class="btn btn-primary" type="submit">Add</button>
+                <a href="/" role="button" class="btn btn-secondary">Cancel</a>
+             </form>
+            </div>
+        </div>
+        <%- include("./partials/footer.ejs") %>
+    </body>
+</html>

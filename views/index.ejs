@@ -1,0 +1,29 @@
+<html>
+    <%- include("./partials/head.ejs") %>
+    <body>
+        <!-- navigation-->
+        <%- include("./partials/nav_guest.ejs") %>
+        <div class="container" style="height:381px;">
+         <div class="row">
+            <div class="col-sm-10 offset-sm-2 m-3">
+             <ul class="text-light font-weight-bold">
+                 <li> This is a password management system and you can store your password safety.</li>
+                 <li> If you forgot passsword,you can see this by login this system.</li> 
+                 <li> We give access to , </li>
+                 </ul>
+             <div class="row">
+                 <ul class="text-light list-group col-sm-5 offset-sm-2 font-weight-bold">
+                 <li class="list-group-item list-group-item-primary text-center">Add passwords</li>
+                 <li class="list-group-item list-group-item-dark text-center">View passwords</li>
+                 <li class="list-group-item list-group-item-success text-center">Edit passwords</li>
+                 <li class="list-group-item list-group-item-danger text-center">Delete passwords</li>
+             </ul>
+             </div>
+               <p class="badge rounded-pill bg-warning text-dark fs-5 m-4 p-1">*** You should login or sign up to access system ***</p>
+             </div>
+          </div>
+        </div>
+        <%- include("./partials/footer.ejs") %>
+        
+    </body>
+</html>

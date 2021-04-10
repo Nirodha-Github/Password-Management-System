@@ -1,0 +1,35 @@
+<html>
+    <%- include("./partials/head.ejs") %>
+    <body>
+        <%- include("./partials/nav.ejs") %>
+        <div class="container" style="min-height:373px;">
+            <div class="row m-2">
+              <h2 class="text-center text-info col-sm-12">View all data</h2>
+              
+            <table class="table col-sm-8 offset-sm table-bordered table-dark">
+                      <tr>
+                         <th>Website</th>
+                         <th>Username</th>
+                         <th>Password</th>
+                         <th>Do you want to view more</th                     
+                      </tr>
+             <% if(details.length > 0) { %>
+               <% details.forEach(detail =>{ %>
+                      <tr>
+                         <td><%= detail.website %></td>
+                         <td><%= detail.username %></td>
+                         <td><%= detail.password %></td>
+                         <td><a href="details/<%= detail._id%>" role="button" class="btn rounded-pill btn-info" data-doc="<%= detail._id%>">Click here</a></td>
+                      </tr>              
+             <% }) %>
+               
+           <% } else { %>
+           <tr class="text-center"><td colspan="4" class="alert alert-dark" style="font-size:15px;">There are no data to display yet.</td></tr>
+           <% } %>
+            </table>
+           </div>
+        </div>
+        <%- include("./partials/footer.ejs") %>
+
+    </body>
+</html>

@@ -1,0 +1,43 @@
+<html>
+    <%- include("./partials/head.ejs") %>
+    <body>
+        <div class="container mt-sm-5">
+            <div class="row justify-content-center">
+                <div class="card  col-sm-6 offset-sm">
+                   <div class="card-container">
+                     <h3 class="card-header text-info text-center">Password Management System-Sign in</h3><br>  
+                     <form class="card-body" method="POST" action="/secret">
+                    
+                      <div class="form-group"><label for="email" class="form-label text-dark" >User Name</label><input class="form-control" id="email" placeholder="Enter your username"   type="email" name="email"></div>
+                      <div class="form-group"><label for="password" class="form-label text-darkt" >Password</label><input class="form-control" id="password" placeholder="Enter your password"  type="password" name="password"></div>                    
+                      <div class="m-3">
+                          <button class="btn btn-primary btn-md pl-5 pr-5 text-start" id="login" type="submit">login</button>
+                          <p class="text-end"><a href="#">Forgot password?</a></p>
+                      </div>
+                      <div class="card-footer">
+                          <p class="text-center">Are you a new user? <a href="/signup"> Create an account</a></p>
+                      </div>
+                </form>
+             </div>
+             </div>
+            </div>
+        </div>
+        <script>
+$(document).ready(function(){
+    var email,pass;
+    $("#login").click(function(){
+        email=$("#email").val();
+        pass=$("#pass").val();
+        /*
+        * Perform some validation here.
+        */
+        $.post("/login",{email:email,password:pass},function(data){
+            if(data==='done') {
+                window.location.href="/secret";
+            }
+        });
+    });
+});
+</script>
+    </body>
+</html>

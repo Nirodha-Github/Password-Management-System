@@ -2,15 +2,20 @@
 <nav>
     <div class="jumbotron mb-0 p-3" style="height:138px;background-color:#FEF9C7;">
        <h1 style="color:maroon" class="text-center">Password Management System</h1>
-        <p class="text-center" style="color:dimgray"><i>~We keep your paswords securely...</i></p>         
+        <p class="text-center" style="color:dimgray"><i>~We keep your passwords securely...</i></p>         
     </div>
     <ul class="nav justify-content-end mt-0 p-1"  style="background-color:#844D36;">
            <li class="nav-item"><a class="nav-link active" aria-current="page" href="/secret">Home</a></li>
            <li class="nav-item"><a class="nav-link" href="/details/add">Add</a></li>
            <li class="nav-item"><a class="nav-link"  href="/details">View</a></li>
-           <li class="nav-item btn-group">
-               <a class="nav-link btn btn-outline-warning" role="button"  href="/profile">Profile</a>
-               <a class="nav-link btn btn-outline-warning" role="button"   href="/">Logout</a>
+           <li class="nav-item dropdown">
+             <button class="btn btn-outline-warning dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                 <%= profiledata.name %>
+            </button>
+           <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+             <li><a class="dropdown-item" href="/<%= profiledata._id%>">Profile</a></li>
+             <li><a class="dropdown-item" href="/">Logout</a></li>
+          </ul>
           </li>
     </ul>       
 </nav>

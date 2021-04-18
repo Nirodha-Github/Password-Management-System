@@ -3,22 +3,20 @@
     <body>
         <!-- navigation-->
         <%- include("./partials/nav.ejs") %>
-        <div class="container" style="height:379px;">
+        <div class="container" style="height:365px;">
             <div class="row m-3">  
-             <form class="col-sm-10 offset-sm-1" method="POST" action="/profile">
+             <form class="col-sm-10 offset-sm" method="POST" action="/<%= profiledata._id %>">
                 <div class="row">
                     <h3 class="col-sm-9 text-info mt-2 mb-2">Profile</h3>
                     <span class="col-sm-3 btn-group">
-                        <button type="submit" class="btn btn-success" >Update</button>
-                        <button class="btn btn-danger delete">Delete</button>
-                        <button class="btn btn-secondary" href="/details">Cancel</button> 
+                        <button type="submit" class="btn btn-success" data-doc="<%= profiledata._id%>">Update</button>
+                        <a role="button" class="btn btn-dark" href="/secret">Cancel</a> 
                     </span>  
                 </div>    
-                <input type="hidden" value="<%= profile._id%>"/>
-                <div class="form-group"><label class="form-label text-light" for="website">Name</label><input class="form-control text-dark" id="website" type="text" name="name" value="<%= profile.name %>"></div>
-                <div class="form-group"><label class="form-label text-light" for="username">Email</label><input class="form-control text-dark" id="username" type="text" name="email" value="<%= profile.email %>" </div>
-                <div class="form-group"><label class="form-label text-light" for="pass">Password</label><input class="form-control text-dark" id="pass" type="password" name="password" value="<%= profile.password %>"></div>
-                <div class="form-group"><label class="form-label text-light" for="pass">PhoneNumber</label><input class="form-control text-dark" id="phone" type="tel" name="phonenumber" value="<%= profile.phonenumber %>"></div>
+                <input type="hidden" value="<%= profiledata._id%>"/>
+                <div class="form-group"><label class="form-label text-light" for="name">Name</label><input class="form-control text-dark" id="name" type="text" name="name" value="<%= profiledata.name %>"></div>
+                <div class="form-group"><label class="form-label text-light" for="email">Email</label><input class="form-control text-dark" id="email" type="text" name="email" value="<%= profiledata.email %>"></div>
+                <div class="form-group"><label class="form-label text-light" for="phonenumber">PhoneNumber</label><input class="form-control text-dark" id="phonenumber" type="tel" name="phonenumber" value="<%= profiledata.phonenumber %>"></div>
             </form>
             </div>
         </div>

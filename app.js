@@ -7,16 +7,17 @@ const bodyParser = require('body-parser');
 const passwordRoutes = require('./routes/passwordRoutes');
 //var cookieParser = require("cookie-parser");
 const session = require("express-session");
+const MongoDBsession = require("connect-mongoDB-session")(session);
+const bcrypt =  require('bcrypt');
 var morgan = require("morgan");
 const path= require('path');
-
 //express app
 const app = express();
 const router = express.Router();
 //connect mongodb
 const dbURI = 'mongodb+srv://Nirodha:niro123@cluster0.kfbtx.mongodb.net/PasswordList?retryWrites=true&w=majority'
 
-mongoose.connect(dbURI, { useNewUrlParser:true, useUnifiedTopology:true})
+mongoose.connect(dbURI, { useNewUrlParser:true,useCreateIndex:true,useFindAndModify: false  ,useUnifiedTopology:true})
    .then((result) => app.listen(3500))
    .catch((err) => console.log(err));
 
@@ -24,7 +25,12 @@ mongoose.connect(dbURI, { useNewUrlParser:true, useUnifiedTopology:true})
 //register view engine
 app.set('view engine','ejs');
 
-app.use(session({secret:'keyboard cat',saveUninitialized: true,resave: true}));
+const store =  new MongoDBsession({
+    uri:dbURI,
+    collection:"mySessions",
+});
+
+app.use(session({secret:'keyboard cat',saveUninitialized:false,resave: false,store:store}));
 app.use(bodyParser.json());  
 
 //app.listen(3500);
@@ -42,7 +48,14 @@ var passwords = generator.generateMultiple(5, {
 app.use(morgan("dev"));
 
 //app.use(cookieParser());
-
+const isAuth = (req,res,next)=>{
+   if(req.session.isAuth){
+       next()
+   }
+   else{
+       res.redirect('/login');
+   }
+}
 
 //signup
 app.get("/signup",(req,res)=>{
@@ -50,7 +63,7 @@ app.get("/signup",(req,res)=>{
 });
 
 // Register Handle
-app.post('/signup', (req, res) => {
+app.post('/signup', async (req, res) => {
     const { name, email, password, repassword,phonenumber} = req.body;
 
     // Check required fields
@@ -59,23 +72,25 @@ app.post('/signup', (req, res) => {
     }
 
     // Check if passwords match
-    if(password !== repassword) {
+    else if(password !== repassword) {
         console.log('Passwords do not match');
     }
 
     // Check password length
-    if(password.length < 3) {
-        console.log('Password should be at least 8 characters long');
+    else if(password.length < 8) {
+        console.log('Password should be at least 8 characters');
     }
 
         // Passed Validation
-        User.findOne({ email: email })
+    else { User.findOne({ email: email })
             .then(user => {
                 if(user) {
                     // User exists
-                    res.write('<p>Email already registered</p>');
+                    res.send('<p>Email already registered</p>');
+                    res.redirect('/signup');
 
                 } else {
+                   // const hashedPw = bcrypt.hash(password,10);
                     const userdata = new User(req.body);
                     
                     userdata.save()
@@ -91,10 +106,10 @@ app.post('/signup', (req, res) => {
             .catch(err=>{
               console.log(err);
             })
-   
+    }
 })
 
-var sess; // global session, NOT recommended
+//var sess; // global session, NOT recommended
 
 // route for user Login
 app.get("/login", (req, res) => { 
@@ -102,81 +117,108 @@ app.get("/login", (req, res) => {
 });
 
 // route for user Login
-app.post("/login", (req, res) => {
+app.post("/login", async (req, res) => {
     const {email, password} = req.body;
  
     // Check required fields
     if(!email || !password){
         console.log('Please fill in all fields');
+        
     }
 
         // Passed Validation
-      User.findOne({ email: email })
+    User.findOne({ email: email })
             .then(user => {
                 if(user) {
                     // User exists
-                     if(password=== user.password){
-                        
-                       // sess = req.session;
-                       // sess.email = user.email;                       
+                    bcrypt.compare(password, user.password, function(err, isMatch) {
+                    if (err) {
+                        throw err
+                    } else if (!isMatch) {
+                        console.log("Password incorrect!");
+                        res.redirect('/login')
+                    } else {
+                        req.session.isAuth = true;   
+                        req.session.user = user;                                   
                         res.redirect('/secret');
-                        
-                         
-                     }
-                     else{
-                        res.write('password incorrect');
-                     }
+                    }
+                    })
 
+                }
+                if(!user){
+                    res.redirect('/login');
+                    console.log('new member');
                 }
             })
             .catch(err=>{
               console.log(err);
-            })
+            })}
    
-});
+);
 
-app.get('/',(req,res)=>{       
-    res.render('index', { title:"Home Page" });   
-});
-
-// app.get('/',(req,res) => {
-//     sess = req.session;
-//     if(sess.email) {
-//         res.redirect('/secret');
-        
-//     }
-//     res.redirect('/index'); 
-// });
-
-
-app.get('/secret',(req,res)=>{ 
-//    const id= req.params.id;
-   
-//     User.findById(id)
-//       .then(result=>{    
-         res.render('secret', { title:"Home Page"}); 
-         
-    //  })    
-    //   .catch(err=>{
-    //     console.log(err);
-    //   })
-    
-});
-
-app.get('/profile',(req,res)=>{    
-  sess = req.session;
+app.get('/secret',isAuth,(req,res)=>{ 
+   res.render('secret', { title:"Home Page",profiledata:req.session.user}); 
   
-    if(sess.email){
-       res.render('userprofile',{title:'profile page'});
-    }
-       
-   else{
-       console.log(req.body.session);
-   }
-      
-     
+});
+
+//all details
+app.get('/detalis',(req,res,next)=>{    
+    res.redirect('/check');
   });
 
+app.use('/details', passwordRoutes);
+
+app.get('/:id',(req,res)=>{   
+   //const id = req.params.id;
+
+   User.findById(req.session.user._id)
+    .then((result) =>{
+     
+       res.render('userprofile',{title:'profile page',profiledata:req.session.user});
+    })
+    .catch((err) =>{
+      console.log(err);
+    });
+}  
+    
+
+  );
+
+//profile data update
+app.post('/:id',(req,res,next)=>{     
+   let updatedProfile = {
+      name:req.body.name,
+      email:req.body.email,
+      phonenumber:req.body.phonenumber
+    }
+
+   User.findByIdAndUpdate(req.session.user._id, {$set: updatedProfile},{ new: true })
+    .then((result) =>{
+       req.session.user = result;
+       console.log(req.session.user);
+       res.redirect('/'+req.session.user._id);   
+       
+    })
+    .catch((err) =>{
+      console.log(err);
+    });
+});
+
+
+
+/*app.delete('/:id',(req,res,next)=>{
+    
+  User.findByIdAndRemove(req.session.user._id)
+  .then((result) =>{
+    res.json({redirect:'/'+req.session.user._id});
+  })
+  .catch((err) =>{
+    console.log(err);
+  });
+})
+*/
+
+//logout session
 app.get('/logout',(req,res) => {
     req.session.destroy((err) => {
         if(err) {
@@ -188,94 +230,14 @@ app.get('/logout',(req,res) => {
 });
 
 
-//dont change below codes
-app.get('/detalis',(req,res)=>{     
-        res.redirect('/check');
-  });
-
-app.use('/details', passwordRoutes);
-
-//generator
-app.get('/generate',(req,res)=>{
-  res.render('generate', { title:"Generate Passwords"});
+app.get('/',(req,res)=>{  
+    res.render('index', { title:"Home Page" });   
 });
+
 
 //404
 app.use((req,res)=>{
    res.render('404', { title:"404" });
 });
-
-
-// app.get('/',(req,res)=>{     
-    
-//     res.render('index', { title:"Home Page" });
-    
-// });
-
-// app.get('/secret',(req,res)=>{ 
-//    const id= req.params.id;
-//     User.findById(id)
-//       .then(result=>{    
-//          res.render('secret', { title:"Home Page",profiledata:result }); 
-         
-//      })    
-//       .catch(err=>{
-//         console.log(err);
-//       })
-    
-// });
-
-
-// // route for user Login
-// app.post("/login", (req, res) => {
-//     const {username, password} = req.body;
-
-//     // Check required fields
-//     if(!username || !password){
-//         console.log('Please fill in all fields');
-//     }
-
-//         // Passed Validation
-//     User.findOne({ email: username })
-//             .then(user => {
-//                 if(user) {
-//                     // User exists
-//                      if(password== user.password){
-//                          res.redirect('/secret');
-                         
-//                      }
-//                      else{
-//                         res.write('password incorrect');
-//                      }
-
-//                 }
-//             })
-//             .catch(err=>{
-//               console.log(err);
-//             })
-   
-// });
-
-
-//Auth Routes
-
-// route for user logout
-
-
-/*app.get('/profile',(req,res)=>{    
- 
-  const {name,email,password,phonenumber} = req.body;
-
-  User.findOne({email:email})
-    .then((profile=>{
-       res.render('userprofile',{title:'profile page',profile:profile});
-    }))
-    .catch(err=>{
-      console.log(err);
-    })   
-  });
-*/
-
-//password routes
 
 

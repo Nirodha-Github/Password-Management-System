@@ -12,6 +12,10 @@ nav ul li a:hover{
    color:#FCE181;
 }
 
+.dropdown-menu li a:hover,#logout:hover{
+    font-weight:bold;
+}
+
 body{
     background: url("/cover.jpg");
     background-repeat: no-repeat;
